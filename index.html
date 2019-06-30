@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,17 +10,28 @@
         <link rel="stylesheet" href="assets/css/reset.css" />
         <link rel="stylesheet" href="assets/css/style.css" />
         <!-- Jquery -->
-        <script
-            src="https://code.jquery.com/jquery-3.4.1.min.js"
-            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous"
-        ></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     </head>
+
     <body>
-        <!-- todo -->
+        <!-- Food buttons -->
+        <div id="food-buttons"></div>
+
+        <!-- Aside for adding more food buttons -->
+        <aside id="add-container">
+            <h3>Add more buttons!</h3>
+            <input type="text" id="input-food">
+            <button id="button-submit">Submit</button>
+        </aside>
+
+        <!-- Gifs will be added here -->
+        <section id="gif-content">
+        </section>
 
         <!-- Load app.js -->
         <script src="assets/scripts/constants.js"></script>
         <script src="assets/scripts/app.js"></script>
     </body>
+
 </html>

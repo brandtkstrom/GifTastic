@@ -1,17 +1,41 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // TODO - attach event handlers
-    // TODO - retrieve favorites from localstorage
-});
-
 class GifTasticApp {
     constructor(retriever) {
         this.retriever = retriever;
         this.favorites = [];
     }
 
-    loadFavorites() {}
+    initialize() {
+        this.addButtonsToScreen();
+        this.loadFavorites();
+    }
 
-    search() {}
+    loadFavorites() {
+        // TODO - pull favorites from local storage
+    }
+
+    search(searchTerm) {
+        retriever.search(searchTerm, this.addGifsToScreen);
+    }
+
+    addButtonsToScreen() {
+        $("#food-buttons").empty();
+        TOPICS.forEach(topic => {
+            let $button = $("<button>")
+                .addClass("food-button")
+                .prop("food", topic)
+                .text(topic);
+            $("#food-buttons").append($button);
+        });
+    }
+
+    addGifsToScreen(gifs) {
+        // TODO
+        $("#gif-content").empty();
+        gifs.forEach(gif => {
+            let $gif = $("<img>").attr("src", gif.staticUrl);
+            $("#gif-content").append($gif);
+        });
+    }
 }
 
 class Gif {
@@ -21,9 +45,21 @@ class Gif {
         this.state = GIF_STATE.STATIC;
     }
 
-    play() {}
+    play() {
+        if (this.state === GIF_STATE.ANIMATED) {
+            // Already playing...
+            return;
+        }
+        // TODO
+    }
 
-    pause() {}
+    pause() {
+        if (this.state === GIF_STATE.STATIC) {
+            // Already paused...
+            return;
+        }
+        // TODO
+    }
 
     markFavorite() {}
 }
@@ -31,11 +67,64 @@ class Gif {
 class GifRetriever {
     constructor() {}
 
-    buildRequestUrl(params) {
-        params.push(`api_key=${API_KEY}`);
-        let paramString = params.join('&');
+    buildRequestUrl(searchTerm) {
+        let params = DEFAULT_PARAMS;
+        params.push(`q=${searchTerm}`);
+
+        let paramString = params.join("&");
+
         return `${API_BASE_URI}?${paramString}`;
     }
 
-    search(searchTerm) {}
+    buildGifObjects(data) {
+        let gifs = [];
+        data.forEach(obj => {
+            let animated = obj.images.fixed_height.url;
+            let still = obj.images.fixed_height_still.url;
+            let gif = new Gif(animated, still);
+            gifs.push(gif);
+        });
+        return gifs;
+    }
+
+    search(searchTerm, callback) {
+        let requestUrl = this.buildRequestUrl(searchTerm);
+        $.ajax({
+            url: requestUrl,
+            method: "GET"
+        }).then(response => {
+            console.log(response.data);
+            let gifs = this.buildGifObjects(response.data);
+            callback(gifs);
+        });
+    }
 }
+
+// Attach event listeners when DOM content is loaded
+document.addEventListener("DOMContentLoaded", () => {
+    // Attach event listeners
+    $("#food-buttons").on("click", ".food-button", function() {
+        let food = $(this).prop("food");
+        gifTasticApp.search(food);
+    });
+
+    $("#button-submit").on("click", () => {
+        let newFood = $("#input-food")
+            .val()
+            .trim();
+        if (newFood === "") {
+            return;
+        }
+
+        let $newFoodButton = $("<button>")
+            .addClass("food-button")
+            .prop("food", newFood)
+            .text(newFood);
+        $("#food-buttons").append($newFoodButton);
+    });
+});
+
+// Instantiate app objects
+var retriever = new GifRetriever();
+var gifTasticApp = new GifTasticApp(retriever);
+gifTasticApp.initialize();
