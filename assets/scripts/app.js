@@ -29,14 +29,13 @@ class GifTasticApp {
     }
 
     addGifsToScreen(gifs) {
-        $("#gif-content").empty();
         gifs.forEach(gif => {
             let $gif = $("<img>")
                 .attr("src", gif.staticUrl)
                 .addClass("gif")
                 .data("gif-data", gif)
                 .prop("state", gif.state);
-            $("#gif-content").append($gif);
+            $("#gif-content").prepend($gif);
         });
     }
 }
@@ -74,6 +73,8 @@ class Gif {
 class GifRetriever {
     buildRequestUrl(searchTerm) {
         let params = DEFAULT_PARAMS;
+        let offset = this.getOffset();
+        params.push(`offset=${offset}`);
         params.push(`q=${searchTerm}`);
 
         let paramString = params.join("&");
@@ -90,6 +91,10 @@ class GifRetriever {
             gifs.push(gif);
         });
         return gifs;
+    }
+
+    getOffset() {
+        return Math.floor(Math.random() * 100);
     }
 
     search(searchTerm, callback) {
