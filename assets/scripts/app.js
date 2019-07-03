@@ -18,24 +18,24 @@ class GifTasticApp {
     }
 
     addButtonsToScreen() {
-        $("#food-buttons").empty();
+        $('#food-buttons').empty();
         TOPICS.forEach(topic => {
-            let $button = $("<button>")
-                .addClass("food-button")
-                .prop("food", topic)
+            let $button = $('<button>')
+                .addClass('food-button')
+                .prop('food', topic)
                 .text(topic);
-            $("#food-buttons").append($button);
+            $('#food-buttons').append($button);
         });
     }
 
     addGifsToScreen(gifs) {
         gifs.forEach(gif => {
-            let $gif = $("<img>")
-                .attr("src", gif.staticUrl)
-                .addClass("gif")
-                .data("gif-data", gif)
-                .prop("state", gif.state);
-            $("#gif-content").prepend($gif);
+            let $gif = $('<img>')
+                .attr('src', gif.staticUrl)
+                .addClass('gif')
+                .data('gif-data', gif)
+                .prop('state', gif.state);
+            $('#gif-content').prepend($gif);
         });
     }
 }
@@ -57,12 +57,12 @@ class Gif {
 
     play(element) {
         this.state = GIF_STATE.ANIMATED;
-        element.attr("src", this.url).data("gif-data", this);
+        element.attr('src', this.url).data('gif-data', this);
     }
 
     pause(element) {
         this.state = GIF_STATE.STATIC;
-        element.attr("src", this.staticUrl).data("gif-data", this);
+        element.attr('src', this.staticUrl).data('gif-data', this);
     }
 
     markFavorite() {
@@ -77,7 +77,7 @@ class GifRetriever {
         params.push(`offset=${offset}`);
         params.push(`q=${searchTerm}`);
 
-        let paramString = params.join("&");
+        let paramString = params.join('&');
 
         return `${API_BASE_URI}?${paramString}`;
     }
@@ -101,9 +101,8 @@ class GifRetriever {
         let requestUrl = this.buildRequestUrl(searchTerm);
         $.ajax({
             url: requestUrl,
-            method: "GET"
+            method: 'GET'
         }).then(response => {
-            console.log(response.data);
             let gifs = this.buildGifObjects(response.data);
             callback(gifs);
         });
@@ -111,36 +110,37 @@ class GifRetriever {
 }
 
 // Attach event listeners when DOM content is loaded
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
     // Perform search for food associated with button that is clicked
-    $("#food-buttons").on("click", ".food-button", function() {
-        let food = $(this).prop("food");
+    $('#food-buttons').on('click', '.food-button', function() {
+        let food = $(this).prop('food');
         gifTasticApp.search(food);
     });
 
     // Handle adding new button with user-specified value
-    $("#button-submit").on("click", () => {
-        let newFood = $("#input-food")
+    $('#button-submit').on('click', evt => {
+        evt.preventDefault();
+        let newFood = $('#input-food')
             .val()
             .trim();
 
-        if (newFood === "") {
+        if (newFood === '') {
             return;
         }
 
-        let $newFoodButton = $("<button>")
-            .addClass("food-button")
-            .prop("food", newFood)
+        let $newFoodButton = $('<button>')
+            .addClass('food-button')
+            .prop('food', newFood)
             .text(newFood);
-        $("#food-buttons").append($newFoodButton);
+        $('#food-buttons').append($newFoodButton);
 
-        $("#input-food").val("");
+        $('#input-food').val('');
     });
 
     // Toggle between animated/static states when gifs are clicked
-    $("#gif-content").on("click", ".gif", function() {
+    $('#gif-content').on('click', '.gif', function() {
         let $gifElement = $(this);
-        let $gif = $($gifElement).data("gif-data");
+        let $gif = $($gifElement).data('gif-data');
         $gif.toggleState($gifElement);
     });
 });

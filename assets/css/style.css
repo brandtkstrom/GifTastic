@@ -1,0 +1,13 @@
+#gif-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.food-button {
+    padding: 10px 20px;
+}
+
+.gif {
+    margin: 5px;
+}
