@@ -1,13 +1,53 @@
-#gif-content {
+html,
+body {
+    height: 100%;
+    background-color: rgb(47, 49, 54);
+    color: rgb(255, 255, 255);
+    font-family: "Roboto", sans-serif;
+}
+
+#food-buttons,
+#gif-content,
+#gif-favorites {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
+    padding: 10px;
+}
+
+#gif-favorites {
+    justify-content: space-evenly;
+    background-color: rgb(32, 34, 37);
 }
 
 .food-button {
     padding: 10px 20px;
+    margin: 5px;
+    text-transform: capitalize;
+    font-weight: bold;
+    outline: none;
+    border: 1px solid rgb(255, 255, 255);
+    background-color: rgb(47, 49, 54);
+    color: rgb(255, 255, 255);
+}
+
+.food-button:hover {
+    background-color: rgb(255, 255, 255);
+    color: rgb(47, 49, 54);
+    transition: ease 200ms;
 }
 
 .gif {
     margin: 5px;
+}
+
+.heart {
+    color: red;
+    border-radius: 10px;
+    padding: 10px;
+    visibility: hidden;
+}
+
+img {
+    border: 1px solid rgb(255, 255, 255);
 }

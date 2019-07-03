@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>GifTastic</title>
         <!-- Link CSS files -->
+        <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="assets/css/reset.css" />
         <link rel="stylesheet" href="assets/css/style.css" />
-        <!-- Jquery -->
-        <script
-            src="https://code.jquery.com/jquery-3.4.1.min.js"
-            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous"
-        ></script>
+        <!-- Scripts -->
+        <script src="https://kit.fontawesome.com/622bde9dfc.js"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     </head>
 
     <body>
@@ -29,11 +29,19 @@
             </form>
         </aside>
 
-        <!-- Gifs will be added here -->
-        <section id="gif-content"></section>
+        <div id="gif-container">
+
+            <!-- Display favorites (if any) first -->
+            <section id="gif-favorites"></section>
+            <!-- Gifs will be added here -->
+            <section id="gif-content"></section>
+
+        </div>
+
 
         <!-- Load app.js -->
         <script src="assets/scripts/constants.js"></script>
         <script src="assets/scripts/app.js"></script>
     </body>
+
 </html>
