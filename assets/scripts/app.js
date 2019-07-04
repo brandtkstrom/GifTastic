@@ -49,6 +49,10 @@ class GifTasticApp {
         $("#gif-favorites").hide();
     }
 
+    clearGifs() {
+        $("#gif-content .gif").remove();
+    }
+
     addButtonsToScreen() {
         $("#food-buttons").empty();
         TOPICS.forEach(topic => {
@@ -232,6 +236,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     $("#clear-favorites").on("click", function() {
         gifTasticApp.clearFavorites();
+    });
+    $("#clear-gifs").on("click", function() {
+        gifTasticApp.clearGifs();
     });
 });
 

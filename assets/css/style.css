@@ -24,6 +24,7 @@ h1 {
 #food-buttons,
 #gif-content,
 #gif-favorites {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
@@ -35,7 +36,6 @@ h1 {
 }
 
 #gif-favorites {
-    position: relative;
     justify-content: space-evenly;
     background-color: rgb(32, 34, 37);
     border-color: rgb(255, 255, 255);
@@ -43,10 +43,20 @@ h1 {
     border-bottom: 1px solid;
 }
 
+#gif-content {
+    margin-top: 20px;
+}
+
+#clear-gifs,
 #clear-favorites {
     color: rgba(255, 255, 255, 0.5);
     position: absolute;
     top: 10px;
+    right: 10px;
+}
+
+#clear-gifs {
+    top: -15px;
     right: 10px;
 }
 
@@ -56,12 +66,14 @@ h1 {
 }
 
 #add-button:hover,
+#clear-gifs:hover,
 #clear-favorites:hover {
     color: rgb(173, 255, 47);
     transition: ease 200ms;
 }
 
 #add-button:active,
+#clear-gifs:active,
 #clear-favorites:active {
     color: rgba(255, 255, 255, 1);
     transition: ease 200ms;
