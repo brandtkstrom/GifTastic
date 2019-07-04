@@ -24,10 +24,6 @@ class GifTasticApp {
     }
 
     addFavorite(gif) {
-        // todo - add favorite
-        // todo toggle fav section
-        // append to fav section
-        console.log("gif added to favorites section");
         let favIcon = $(gif).children("i");
         favIcon.removeClass("fa-heart").addClass("fa-heart-broken");
 
@@ -45,6 +41,12 @@ class GifTasticApp {
         if (this.favoriteCount === 0) {
             $("#gif-favorites").hide();
         }
+    }
+
+    clearFavorites() {
+        $("#gif-favorites .gif").remove();
+        this.favoriteCount = 0;
+        $("#gif-favorites").hide();
     }
 
     addButtonsToScreen() {
@@ -227,6 +229,9 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("remove favorite");
         let parent = $(this).parent();
         gifTasticApp.removeFavorite(parent);
+    });
+    $("#clear-favorites").on("click", function() {
+        gifTasticApp.clearFavorites();
     });
 });
 
