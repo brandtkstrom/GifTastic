@@ -2,7 +2,7 @@ class GifTasticApp {
     constructor(retriever) {
         this.retriever = retriever;
         this.topics = [...TOPICS];
-        this.favorites = new Map();
+        this.savedFavorites = new Map();
         this.favoriteCount = 0;
         this.gifs = new Map();
     }
@@ -13,17 +13,44 @@ class GifTasticApp {
     }
 
     loadFavorites() {
-        // TODO - pull favorites from local storage
-        // TODO - update favorite count
+        let saved = localStorage.getItem("favorite-gifs");
+        let favArray = [];
+        let newId = 0;
+        if (saved != "{}") {
+            let favorites = new Map(JSON.parse(saved));
+            if (favorites && favorites.entries) {
+                for (let [guid, gif] of favorites.entries()) {
+                    console.log(`Loaded gif ${guid} from localStorage.`);
+                    // Reset gif id, then add to gifs map
+                    let tempGif = new Gif(
+                        newId,
+                        gif.guid,
+                        gif.url,
+                        gif.staticUrl
+                    );
+                    this.gifs.set(newId, tempGif);
+                    newId++;
+                    // Create new gif div element
+                    let gifDiv = this.createGifDiv(tempGif, true);
+                    favArray.push(gifDiv);
+                }
+            }
+        }
 
-        if (this.favoriteCount === 0) {
+        if (favArray.length > 0) {
+            this.showFavorites();
+            favArray.forEach(fav => this.addFavorite(fav, true));
+            this.retriever.gifId = newId += 1;
+        } else {
             this.hideFavorites();
         }
     }
 
     async search(searchTerm) {
         let gifs = await gifRetriever.search(searchTerm);
-        this.addGifsToScreen(gifs);
+        if (gifs) {
+            this.addGifsToScreen(gifs);
+        }
     }
 
     showFavorites() {
@@ -57,13 +84,34 @@ class GifTasticApp {
         this.showFavorites();
         let favorites = document.querySelector("#gif-favorites");
         favorites.prepend(gif);
+
+        let gifId = parseInt(gif.firstChild.getAttribute("id"));
+        let gifObj = this.gifs.get(gifId);
+        if (gifObj && !this.savedFavorites.get(gifObj.guid)) {
+            this.savedFavorites.set(gifObj.guid, gifObj);
+            localStorage.setItem(
+                "favorite-gifs",
+                JSON.stringify(Array.from(this.savedFavorites))
+            );
+        }
     }
 
     removeFavorite(gif) {
+        let gifId = parseInt(gif.firstChild.getAttribute("id"));
         gif.remove();
 
         this.favoriteCount--;
         this.favoriteCount = Math.max(this.favoriteCount, 0);
+
+        let gifObj = this.gifs.get(gifId);
+        if (gifObj) {
+            console.log(`Removed gif ${gifObj.guid} from localStorage.`);
+            this.savedFavorites.delete(gifObj.guid);
+            localStorage.setItem(
+                "favorite-gifs",
+                JSON.stringify(Array.from(this.savedFavorites))
+            );
+        }
 
         if (this.favoriteCount === 0) {
             this.hideFavorites();
@@ -75,7 +123,7 @@ class GifTasticApp {
         favGifs.forEach(favorite => favorite.remove());
 
         this.hideFavorites();
-
+        localStorage.removeItem("favorite-gifs");
         this.favoriteCount = 0;
     }
 
@@ -118,7 +166,7 @@ class GifTasticApp {
         });
     }
 
-    createGifDiv(gif) {
+    createGifDiv(gif, favorite = false) {
         let gifDiv = document.createElement("div");
         gifDiv.className = "gif";
 
@@ -133,6 +181,13 @@ class GifTasticApp {
         heart.style.position = "absolute";
         heart.style.top = 0;
         heart.style.right = 0;
+
+        // If this is a favorite gif
+        if (favorite) {
+            heart.classList.remove("fa-heart");
+            heart.classList.add("fa-heart-broken");
+            heart.classList.add("favorite");
+        }
 
         gifDiv.append(img, heart);
 
@@ -159,8 +214,9 @@ class GifTasticApp {
 }
 
 class Gif {
-    constructor(id, url, staticUrl) {
+    constructor(id, guid, url, staticUrl) {
         this.id = id;
+        this.guid = guid;
         this.url = url;
         this.staticUrl = staticUrl;
         this.state = GIF_STATE.STATIC;
@@ -213,7 +269,7 @@ class GifRetriever {
         data.forEach(obj => {
             let animated = obj.images.fixed_height.url;
             let still = obj.images.fixed_height_still.url;
-            let gif = new Gif(this.gifId++, animated, still);
+            let gif = new Gif(this.gifId++, obj.id, animated, still);
             gifs.push(gif);
         });
         return gifs;
@@ -271,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let gifId = parseInt(evt.target.getAttribute("id"));
             gifTasticApp.toggleGifState(gifId);
         } else if (evt.target.classList.contains("favorite")) {
-            // TODO - remove favorite
+            // Handle removing favorite gif
             let heart = evt.target;
             let gifDiv = heart.parentNode;
             gifTasticApp.removeFavorite(gifDiv);
