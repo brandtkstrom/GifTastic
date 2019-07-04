@@ -28,6 +28,10 @@ h1 {
     font-weight: bold;
 }
 
+img {
+    border: 1px solid rgb(255, 255, 255);
+}
+
 #topic-buttons,
 #gif-content,
 #gif-favorites {
@@ -128,8 +132,10 @@ h1 {
     visibility: hidden;
 }
 
-img {
-    border: 1px solid rgb(255, 255, 255);
+.rating {
+    width: 100%;
+    text-align: center;
+    text-transform: uppercase;
 }
 
 @media screen and (max-width: 680px) {

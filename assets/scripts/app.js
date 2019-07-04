@@ -26,7 +26,8 @@ class GifTasticApp {
                         newId,
                         gif.guid,
                         gif.url,
-                        gif.staticUrl
+                        gif.staticUrl,
+                        gif.rating
                     );
                     this.gifs.set(newId, tempGif);
                     newId++;
@@ -49,6 +50,8 @@ class GifTasticApp {
     async search(searchTerm) {
         let gifs = await gifRetriever.search(searchTerm);
         if (gifs) {
+            console.log("Gifs found:");
+            console.log(gifs);
             this.addGifsToScreen(gifs);
         }
     }
@@ -189,7 +192,11 @@ class GifTasticApp {
             heart.classList.add("favorite");
         }
 
-        gifDiv.append(img, heart);
+        let rating = document.createElement("p");
+        rating.classList.add("rating");
+        rating.innerText = gif.rating;
+
+        gifDiv.append(img, heart, rating);
 
         gifDiv.addEventListener("mouseenter", evt => {
             let heart = evt.target.childNodes[1];
@@ -214,11 +221,12 @@ class GifTasticApp {
 }
 
 class Gif {
-    constructor(id, guid, url, staticUrl) {
+    constructor(id, guid, url, staticUrl, rating) {
         this.id = id;
         this.guid = guid;
         this.url = url;
         this.staticUrl = staticUrl;
+        this.rating = rating;
         this.state = GIF_STATE.STATIC;
     }
 
@@ -269,7 +277,8 @@ class GifRetriever {
         data.forEach(obj => {
             let animated = obj.images.fixed_height.url;
             let still = obj.images.fixed_height_still.url;
-            let gif = new Gif(this.gifId++, obj.id, animated, still);
+            let rating = obj.rating.toUpperCase();
+            let gif = new Gif(this.gifId++, obj.id, animated, still, rating);
             gifs.push(gif);
         });
         return gifs;
