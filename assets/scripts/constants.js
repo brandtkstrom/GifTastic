@@ -23,13 +23,9 @@ const TOPICS = [
     "pizza",
     "cheese",
     "beef",
-    "salad",
     "bacon",
     "cookie",
     "candy",
-    "bread",
     "beer",
-    "sushi",
-    "ramen",
-    "kebab"
+    "sushi"
 ];

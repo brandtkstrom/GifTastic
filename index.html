@@ -17,18 +17,18 @@
     </head>
 
     <body>
+
+        <header>
+            <h1>GifTastic!</h1>
+            <!-- Input for adding buttons -->
+            <form id="add-form">
+                <i id="add-button" class="fas fa-plus-square fa-2x"></i>
+                <input id="add-input" type="text" placeholder="Add a button!" />
+            </form>
+        </header>
+
         <!-- Food buttons -->
         <div id="food-buttons"></div>
-
-        <!-- Aside for adding more food buttons -->
-        <aside id="add-container">
-            <form>
-                <h3>Add more buttons!</h3>
-                <input type="text" id="input-food" />
-                <button type="submit" id="button-submit">Submit</button>
-            </form>
-        </aside>
-
         <div id="gif-container">
 
             <!-- Display favorites (if any) first -->
@@ -37,7 +37,6 @@
             <section id="gif-content"></section>
 
         </div>
-
 
         <!-- Load app.js -->
         <script src="assets/scripts/constants.js"></script>

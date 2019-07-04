@@ -6,18 +6,69 @@ body {
     font-family: "Roboto", sans-serif;
 }
 
+header {
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(32, 34, 37);
+    border-color: rgb(255, 255, 255);
+    border-bottom: 2px solid;
+}
+
+h1 {
+    align-self: center;
+    padding: 15px;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
 #food-buttons,
 #gif-content,
 #gif-favorites {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
-    padding: 10px;
+    justify-content: space-around;
+    padding: 15px;
+}
+
+#food-buttons {
+    justify-content: center;
 }
 
 #gif-favorites {
     justify-content: space-evenly;
     background-color: rgb(32, 34, 37);
+    border-color: rgb(255, 255, 255);
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+}
+
+#add-button {
+    color: rgba(255, 255, 255, 0.5);
+    vertical-align: middle;
+}
+
+#add-button:hover {
+    color: rgb(173, 255, 47);
+    transition: ease 200ms;
+}
+
+#add-button:active {
+    color: rgba(255, 255, 255, 1);
+    transition: ease 200ms;
+}
+
+#add-form {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+}
+
+#add-input {
+    font-size: 1.3rem;
+    margin: 10px 0;
+    vertical-align: middle;
+    width: 150px;
+    padding-inline-start: 10px;
 }
 
 .food-button {
@@ -29,6 +80,7 @@ body {
     border: 1px solid rgb(255, 255, 255);
     background-color: rgb(47, 49, 54);
     color: rgb(255, 255, 255);
+    font-size: 1rem;
 }
 
 .food-button:hover {
@@ -50,4 +102,25 @@ body {
 
 img {
     border: 1px solid rgb(255, 255, 255);
+}
+
+@media screen and (max-width: 650px) {
+    h1 {
+        align-self: flex-start;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    h1 {
+        align-self: center;
+        padding: 10px 0;
+    }
+
+    #add-form {
+        position: relative;
+        align-self: center;
+        padding-bottom: 10px;
+        right: inherit;
+        top: inherit;
+    }
 }

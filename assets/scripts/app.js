@@ -160,9 +160,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Handle adding new button with user-specified value
-    $("#button-submit").on("click", evt => {
+    $("#add-button").on("click", evt => {
         evt.preventDefault();
-        let newFood = $("#input-food")
+        let newFood = $("#add-input")
             .val()
             .trim();
 
@@ -176,7 +176,25 @@ document.addEventListener("DOMContentLoaded", () => {
             .text(newFood);
         $("#food-buttons").append($newFoodButton);
 
-        $("#input-food").val("");
+        $("#add-input").val("");
+    });
+    $("#add-form").on("submit", evt => {
+        evt.preventDefault();
+        let newFood = $("#add-input")
+            .val()
+            .trim();
+
+        if (newFood === "") {
+            return;
+        }
+
+        let $newFoodButton = $("<button>")
+            .addClass("food-button")
+            .prop("food", newFood)
+            .text(newFood);
+        $("#food-buttons").append($newFoodButton);
+
+        $("#add-input").val("");
     });
 
     // Toggle between animated/static states when gifs are clicked
