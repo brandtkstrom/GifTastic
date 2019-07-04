@@ -1,3 +1,10 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    position: relative;
+}
+
 html,
 body {
     height: 100%;
@@ -21,7 +28,7 @@ h1 {
     font-weight: bold;
 }
 
-#food-buttons,
+#topic-buttons,
 #gif-content,
 #gif-favorites {
     position: relative;
@@ -31,7 +38,7 @@ h1 {
     padding: 15px;
 }
 
-#food-buttons {
+#topic-buttons {
     justify-content: center;
 }
 
@@ -93,7 +100,7 @@ h1 {
     padding-inline-start: 10px;
 }
 
-.food-button {
+.topic-button {
     padding: 10px 20px;
     margin: 5px;
     text-transform: capitalize;
@@ -105,7 +112,7 @@ h1 {
     font-size: 1rem;
 }
 
-.food-button:hover {
+.topic-button:hover {
     background-color: rgb(255, 255, 255);
     color: rgb(47, 49, 54);
     transition: ease 200ms;

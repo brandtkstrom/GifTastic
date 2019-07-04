@@ -1,8 +1,10 @@
 class GifTasticApp {
     constructor(retriever) {
         this.retriever = retriever;
-        this.favorites = [];
+        this.topics = [...TOPICS];
+        this.favorites = new Map();
         this.favoriteCount = 0;
+        this.gifs = new Map();
     }
 
     initialize() {
@@ -15,110 +17,186 @@ class GifTasticApp {
         // TODO - update favorite count
 
         if (this.favoriteCount === 0) {
-            $("#gif-favorites").hide();
+            this.hideFavorites();
         }
     }
 
-    search(searchTerm) {
-        gifRetriever.search(searchTerm, this.addGifsToScreen);
+    async search(searchTerm) {
+        let gifs = await gifRetriever.search(searchTerm);
+        this.addGifsToScreen(gifs);
+    }
+
+    showFavorites() {
+        if (document.querySelector("#gif-favorites")) {
+            return;
+        }
+
+        let favorites = document.createElement("section");
+        favorites.setAttribute("id", "gif-favorites");
+
+        let favClearBtn = document.createElement("i");
+        favClearBtn.setAttribute("id", "clear-favorites");
+        favClearBtn.className = "fas fa-window-close fa-2x";
+        favClearBtn.addEventListener("click", () => {
+            this.clearFavorites();
+        });
+        favorites.append(favClearBtn);
+        document.querySelector("#gif-container").prepend(favorites);
+    }
+
+    hideFavorites() {
+        let favorites = document.querySelector("#gif-favorites");
+        if (favorites) {
+            favorites.remove();
+        }
     }
 
     addFavorite(gif) {
-        let favIcon = $(gif).children("i");
-        favIcon.removeClass("fa-heart").addClass("fa-heart-broken");
-
-        $("#gif-favorites").prepend(gif);
         this.favoriteCount++;
 
-        $("#gif-favorites").show();
+        this.showFavorites();
+        let favorites = document.querySelector("#gif-favorites");
+        favorites.prepend(gif);
     }
 
     removeFavorite(gif) {
-        $(gif).remove();
+        gif.remove();
+
         this.favoriteCount--;
         this.favoriteCount = Math.max(this.favoriteCount, 0);
 
         if (this.favoriteCount === 0) {
-            $("#gif-favorites").hide();
+            this.hideFavorites();
         }
     }
 
     clearFavorites() {
-        $("#gif-favorites .gif").remove();
+        let favGifs = document.querySelectorAll(".favorite");
+        favGifs.forEach(favorite => favorite.remove());
+
+        this.hideFavorites();
+
         this.favoriteCount = 0;
-        $("#gif-favorites").hide();
     }
 
     clearGifs() {
-        $("#gif-content .gif").remove();
+        let gifs = document.querySelectorAll("#gif-content .gif");
+        gifs.forEach(gif => gif.remove());
+    }
+
+    addNewTopic(newTopic) {
+        if (!newTopic || newTopic === "") {
+            return;
+        }
+
+        let buttonContainer = document.querySelector("#topic-buttons");
+
+        let button = document.createElement("button");
+        button.className = "topic-button";
+        button.setAttribute("topic", newTopic);
+        button.innerText = newTopic;
+
+        buttonContainer.append(button);
+
+        document.querySelector("#add-input").value = "";
     }
 
     addButtonsToScreen() {
-        $("#food-buttons").empty();
-        TOPICS.forEach(topic => {
-            let $button = $("<button>")
-                .addClass("food-button")
-                .prop("food", topic)
-                .text(topic);
-            $("#food-buttons").append($button);
-        });
+        let buttonContainer = document.querySelector("#topic-buttons");
+        buttonContainer.innerHTML = "";
+
+        TOPICS.forEach(topic => this.addNewTopic(topic));
     }
 
     addGifsToScreen(gifs) {
+        let gifContainer = document.querySelector("#gif-content");
         gifs.forEach(gif => {
-            let $gifDiv = $("<div>")
-                .addClass("gif")
-                .css({ position: "relative" });
-            let $gif = $("<img>")
-                .attr("src", gif.staticUrl)
-                .data("gif-data", gif)
-                .prop("state", gif.state)
-                .css({ display: "block" });
-            let $heart = $("<i>")
-                .addClass("fas fa-heart fa-2x heart")
-                .css({
-                    position: "absolute",
-                    top: "0",
-                    right: "0"
-                });
-            $gifDiv.append($gif, $heart);
-            $("#gif-content").prepend($gifDiv);
+            this.gifs.set(gif.id, gif);
+
+            let gifDiv = this.createGifDiv(gif);
+            gifContainer.prepend(gifDiv);
         });
+    }
+
+    createGifDiv(gif) {
+        let gifDiv = document.createElement("div");
+        gifDiv.className = "gif";
+
+        let img = document.createElement("img");
+        img.setAttribute("id", gif.id);
+        img.setAttribute("src", gif.staticUrl);
+        img.setAttribute("state", gif.state);
+        img.className = "gif-image";
+
+        let heart = document.createElement("i");
+        heart.className = "fas fa-heart fa-2x heart";
+        heart.style.position = "absolute";
+        heart.style.top = 0;
+        heart.style.right = 0;
+
+        gifDiv.append(img, heart);
+
+        gifDiv.addEventListener("mouseenter", evt => {
+            let heart = evt.target.childNodes[1];
+            heart.style.visibility = "visible";
+        });
+        gifDiv.addEventListener("mouseleave", evt => {
+            let heart = evt.target.childNodes[1];
+            heart.style.visibility = "hidden";
+        });
+
+        return gifDiv;
+    }
+
+    toggleGifState(gifId) {
+        let gif = this.gifs.get(gifId);
+        if (!gif) {
+            return;
+        }
+
+        gif.toggleState(gifId);
     }
 }
 
 class Gif {
-    constructor(url, staticUrl) {
+    constructor(id, url, staticUrl) {
+        this.id = id;
         this.url = url;
         this.staticUrl = staticUrl;
         this.state = GIF_STATE.STATIC;
     }
 
-    toggleState(element) {
+    toggleState(id) {
+        let img = document.getElementById(id);
+        if (!img) {
+            return;
+        }
+
         if (this.state === GIF_STATE.ANIMATED) {
-            this.pause(element);
+            this.pause(img);
         } else if (this.state === GIF_STATE.STATIC) {
-            this.play(element);
+            this.play(img);
         }
     }
 
-    play(element) {
+    play(img) {
         this.state = GIF_STATE.ANIMATED;
-        element.attr("src", this.url).data("gif-data", this);
+        img.setAttribute("state", this.state);
+        img.setAttribute("src", this.url);
     }
 
-    pause(element) {
+    pause(img) {
         this.state = GIF_STATE.STATIC;
-        element.attr("src", this.staticUrl).data("gif-data", this);
-    }
-
-    markFavorite() {
-        // TODO - mark favorite
-        console.log("gif marked favorite.");
+        img.setAttribute("state", this.state);
+        img.setAttribute("src", this.staticUrl);
     }
 }
 
 class GifRetriever {
+    constructor() {
+        this.gifId = 0;
+    }
+
     buildRequestUrl(searchTerm) {
         let params = DEFAULT_PARAMS;
         let offset = this.getOffset();
@@ -135,7 +213,7 @@ class GifRetriever {
         data.forEach(obj => {
             let animated = obj.images.fixed_height.url;
             let still = obj.images.fixed_height_still.url;
-            let gif = new Gif(animated, still);
+            let gif = new Gif(this.gifId++, animated, still);
             gifs.push(gif);
         });
         return gifs;
@@ -145,99 +223,71 @@ class GifRetriever {
         return Math.floor(Math.random() * 100);
     }
 
-    search(searchTerm, callback) {
+    async search(searchTerm) {
         let requestUrl = this.buildRequestUrl(searchTerm);
-        $.ajax({
-            url: requestUrl,
-            method: "GET"
-        }).then(response => {
-            let gifs = this.buildGifObjects(response.data);
-            callback(gifs);
-        });
+
+        try {
+            let response = await fetch(requestUrl);
+            let json = await response.json();
+            return this.buildGifObjects(json.data);
+        } catch (error) {
+            console.log(error);
+        }
     }
 }
 
 // Attach event listeners when DOM content is loaded
 document.addEventListener("DOMContentLoaded", () => {
-    // Perform search for food associated with button that is clicked
-    $("#food-buttons").on("click", ".food-button", function() {
-        let food = $(this).prop("food");
-        gifTasticApp.search(food);
+    // Perform search for topic associated with button that is clicked
+    document.querySelector("#topic-buttons").addEventListener("click", evt => {
+        if (!evt.target.classList.contains("topic-button")) {
+            return;
+        }
+
+        let topic = evt.target.getAttribute("topic");
+        gifTasticApp.search(topic);
     });
 
     // Handle adding new button with user-specified value
-    $("#add-button").on("click", evt => {
+    function addTopicButton(evt) {
         evt.preventDefault();
-        let newFood = $("#add-input")
-            .val()
-            .trim();
+        let addInput = document.querySelector("#add-input");
+        let newTopic = addInput.value.trim();
+        gifTasticApp.addNewTopic(newTopic);
+        addInput.value = "";
+    }
 
-        if (newFood === "") {
-            return;
+    document
+        .querySelector("#add-button")
+        .addEventListener("click", addTopicButton);
+
+    document
+        .querySelector("#add-form")
+        .addEventListener("submit", addTopicButton);
+
+    document.querySelector("#gif-container").addEventListener("click", evt => {
+        if (evt.target.classList.contains("gif-image")) {
+            // Clicking on gifs toggles between animated/static
+            let gifId = parseInt(evt.target.getAttribute("id"));
+            gifTasticApp.toggleGifState(gifId);
+        } else if (evt.target.classList.contains("favorite")) {
+            // TODO - remove favorite
+            let heart = evt.target;
+            let gifDiv = heart.parentNode;
+            gifTasticApp.removeFavorite(gifDiv);
+        } else if (evt.target.classList.contains("heart")) {
+            // Click on gif heart adds it to favorites section
+            let heart = evt.target;
+            heart.classList.remove("fa-heart");
+            heart.classList.add("fa-heart-broken");
+            heart.classList.add("favorite");
+
+            let gifDiv = heart.parentNode;
+            gifTasticApp.addFavorite(gifDiv);
         }
-
-        let $newFoodButton = $("<button>")
-            .addClass("food-button")
-            .prop("food", newFood)
-            .text(newFood);
-        $("#food-buttons").append($newFoodButton);
-
-        $("#add-input").val("");
-    });
-    $("#add-form").on("submit", evt => {
-        evt.preventDefault();
-        let newFood = $("#add-input")
-            .val()
-            .trim();
-
-        if (newFood === "") {
-            return;
-        }
-
-        let $newFoodButton = $("<button>")
-            .addClass("food-button")
-            .prop("food", newFood)
-            .text(newFood);
-        $("#food-buttons").append($newFoodButton);
-
-        $("#add-input").val("");
     });
 
-    // Toggle between animated/static states when gifs are clicked
-    $("#gif-container").on("click", "img", function() {
-        let $gifElement = $(this);
-        let $gif = $($gifElement).data("gif-data");
-        $gif.toggleState($gifElement);
-    });
-
-    $("#gif-container").on("mouseenter", ".gif", function() {
-        $(this)
-            .children(".heart")
-            .css({ visibility: "visible" });
-    });
-    $("#gif-container").on("mouseleave", ".gif", function() {
-        $(this)
-            .children(".heart")
-            .css({ visibility: "hidden" });
-    });
-    $("#gif-container").on("click", ".heart", function() {
-        let img = $(this).siblings("img")[0];
-        let gif = $(img).data("gif-data");
-        let parent = $(this).parent()[0];
-        console.log(parent);
-
-        gif.markFavorite();
-        gifTasticApp.addFavorite(parent);
-    });
-    $("#gif-favorites").on("click", ".heart", function() {
-        console.log("remove favorite");
-        let parent = $(this).parent();
-        gifTasticApp.removeFavorite(parent);
-    });
-    $("#clear-favorites").on("click", function() {
-        gifTasticApp.clearFavorites();
-    });
-    $("#clear-gifs").on("click", function() {
+    document.querySelector("#clear-gifs").addEventListener("click", () => {
         gifTasticApp.clearGifs();
     });
 });
